@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mini Block Blast</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ================= GLOBAL ================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    color:white;
+
+    padding:20px;
+
+    background:
+    radial-gradient(circle at top left,
+    rgba(0,255,255,.12),
+    transparent 30%),
+
+    radial-gradient(circle at bottom right,
+    rgba(0,120,255,.15),
+    transparent 35%),
+
+    linear-gradient(135deg,#050816,#07142b,#081b3d);
+
+    background-size:200% 200%;
+    animation:bgMove 12s ease infinite;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+/* ================= CONTAINER ================= */
+
+.game-container{
+    width:100%;
+    max-width:520px;
+
+    margin:auto;
+
+    padding:18px;
+
+    border-radius:28px;
+
+    background:rgba(255,255,255,.05);
+
+    backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+    0 0 40px rgba(0,255,255,.12),
+    inset 0 0 15px rgba(255,255,255,.03);
+}
+
+/* ================= TOP ================= */
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:18px;
+}
+
+.title{
+    font-size:24px;
+    font-weight:700;
+
+    background:linear-gradient(to right,#fff,#66ffff);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.score-box{
+    display:flex;
+    gap:10px;
+}
+
+.score-card{
+    padding:8px 14px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    text-align:center;
+}
+
+.score-card h4{
+    font-size:10px;
+    opacity:.7;
+}
+
+.score-card span{
+    font-size:18px;
+    font-weight:600;
+}
+
+/* ================= BOARD ================= */
+
+.board{
+    width:100%;
+    aspect-ratio:1;
+
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+
+    gap:6px;
+
+    padding:10px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.03);
+
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.cell{
+    aspect-ratio:1;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.05);
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.cell:hover{
+    background:rgba(255,255,255,.08);
+}
+
+.cell.filled{
+    background:
+    linear-gradient(135deg,#00ffff,#0077ff);
+
+    box-shadow:
+    0 0 12px cyan,
+    inset 0 0 10px rgba(255,255,255,.35);
+}
+
+/* ================= BLOCKS ================= */
+
+.blocks{
+    margin-top:18px;
+
+    display:flex;
+    gap:10px;
+}
+
+.block{
+    flex:1;
+
+    min-height:90px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.block:hover{
+    transform:translateY(-3px);
+
+    box-shadow:0 0 20px rgba(0,255,255,.18);
+}
+
+.block.selected{
+    border:1px solid cyan;
+
+    box-shadow:0 0 20px cyan;
+}
+
+.shape{
+    display:grid;
+    gap:4px;
+}
+
+.shape-cell{
+    width:22px;
+    height:22px;
+
+    border-radius:6px;
+
+    background:
+    linear-gradient(135deg,#00ffff,#0077ff);
+
+    box-shadow:0 0 8px cyan;
+}
+
+/* ================= BUTTONS ================= */
+
+.buttons{
+    margin-top:18px;
+
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    flex:1;
+
+    padding:13px;
+
+    border:none;
+    border-radius:16px;
+
+    background:
+    linear-gradient(135deg,#00bfff,#0066ff);
+
+    color:white;
+
+    font-size:15px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    text-decoration:none;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+
+    box-shadow:0 0 20px rgba(0,255,255,.3);
+}
+
+/* ================= GAME OVER ================= */
+
+.game-over{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.7);
+
+    display:none;
+    justify-content:center;
+    align-items:center;
+
+    z-index:100;
+}
+
+.game-over-box{
+    width:min(90vw,350px);
+
+    padding:30px;
+
+    border-radius:25px;
+
+    background:#081b3d;
+
+    text-align:center;
+
+    box-shadow:0 0 35px rgba(0,255,255,.2);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+    }
+
+    .title{
+        font-size:20px;
+    }
+
+    .shape-cell{
+        width:16px;
+        height:16px;
+    }
+
+    .block{
+        min-height:70px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div class="game-container">
+
+    <!-- TOP -->
+
+    <div class="top">
+
+        <div class="title">
+            BLOCK BLAST
+        </div>
+
+        <div class="score-box">
+
+            <div class="score-card">
+                <h4>SCORE</h4>
+                <span id="score">0</span>
+            </div>
+
+            <div class="score-card">
+                <h4>HIGH</h4>
+                <span id="high">0</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BOARD -->
+
+    <div class="board" id="board"></div>
+
+    <!-- BLOCKS -->
+
+    <div class="blocks" id="blocks"></div>
+
+    <!-- BUTTON -->
+
+    <div class="buttons">
+
+        <button class="btn" onclick="restartGame()">
+            Restart
+        </button>
+
+        <a href="home.html" class="btn">
+            Kembali
+        </a>
+
+    </div>
+
+</div>
+
+<!-- GAME OVER -->
+
+<div class="game-over" id="gameOver">
+
+    <div class="game-over-box">
+
+        <h1>Game Over</h1>
+
+        <br>
+
+        <button class="btn" onclick="restartGame()">
+            Main Lagi
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ================= VARIABLES ================= */
+
+const SIZE = 6;
+
+const board = document.getElementById("board");
+const blocksContainer = document.getElementById("blocks");
+
+const scoreEl = document.getElementById("score");
+const highEl = document.getElementById("high");
+
+let score = 0;
+
+let highScore =
+localStorage.getItem("block_high") || 0;
+
+highEl.innerText = highScore;
+
+let grid = [];
+
+let selectedBlock = null;
+
+/* ================= SHAPES ================= */
+
+const SHAPES = [
+
+    [[1]],
+
+    [[1,1]],
+
+    [[1,1,1]],
+
+    [[1,1],[1,1]],
+
+    [[1,0],[1,1]],
+
+    [[1,1,1],[0,1,0]],
+
+    [[1,1,0],[0,1,1]]
+
+];
+
+/* ================= SOUND ================= */
+
+function beep(freq=500,duration=100){
+
+    const ctx =
+    new(window.AudioContext||window.webkitAudioContext)();
+
+    const osc = ctx.createOscillator();
+
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.frequency.value = freq;
+
+    osc.start();
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        ctx.currentTime + duration/1000
+    );
+
+    osc.stop(ctx.currentTime + duration/1000);
+}
+
+/* ================= BOARD ================= */
+
+function createBoard(){
+
+    board.innerHTML = "";
+
+    grid = [];
+
+    for(let y=0;y<SIZE;y++){
+
+        let row = [];
+
+        for(let x=0;x<SIZE;x++){
+
+            row.push(0);
+
+            const cell =
+            document.createElement("div");
+
+            cell.className = "cell";
+
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+
+            cell.addEventListener(
+                "click",
+                ()=>placeBlock(x,y)
+            );
+
+            board.appendChild(cell);
+        }
+
+        grid.push(row);
+    }
+}
+
+function drawBoard(){
+
+    const cells =
+    document.querySelectorAll(".cell");
+
+    cells.forEach(cell=>{
+
+        const x = +cell.dataset.x;
+        const y = +cell.dataset.y;
+
+        cell.classList.toggle(
+            "filled",
+            grid[y][x]
+        );
+    });
+}
+
+/* ================= BLOCK ================= */
+
+function renderShape(shape){
+
+    const div =
+    document.createElement("div");
+
+    div.className = "shape";
+
+    div.style.gridTemplateColumns =
+    `repeat(${shape[0].length},1fr)`;
+
+    shape.forEach(row=>{
+
+        row.forEach(cell=>{
+
+            const c =
+            document.createElement("div");
+
+            if(cell){
+
+                c.className = "shape-cell";
+
+            }else{
+
+                c.style.visibility = "hidden";
+            }
+
+            div.appendChild(c);
+        });
+    });
+
+    return div;
+}
+
+function createBlocks(){
+
+    blocksContainer.innerHTML = "";
+
+    for(let i=0;i<3;i++){
+
+        const shape =
+        SHAPES[
+            Math.floor(
+                Math.random()*SHAPES.length
+            )
+        ];
+
+        const block =
+        document.createElement("div");
+
+        block.className = "block";
+
+        block.shape = shape;
+
+        block.appendChild(
+            renderShape(shape)
+        );
+
+        block.addEventListener(
+            "click",
+            ()=>{
+
+                document
+                .querySelectorAll(".block")
+                .forEach(b=>
+                    b.classList.remove("selected")
+                );
+
+                block.classList.add("selected");
+
+                selectedBlock = {
+                    shape,
+                    element:block
+                };
+            }
+        );
+
+        blocksContainer.appendChild(block);
+    }
+}
+
+/* ================= PLACE ================= */
+
+function canPlace(shape,startX,startY){
+
+    for(let y=0;y<shape.length;y++){
+
+        for(let x=0;x<shape[y].length;x++){
+
+            if(shape[y][x]){
+
+                let nx = startX + x;
+                let ny = startY + y;
+
+                if(
+                    nx >= SIZE ||
+                    ny >= SIZE ||
+                    grid[ny][nx]
+                ){
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+function placeBlock(x,y){
+
+    if(!selectedBlock) return;
+
+    const shape = selectedBlock.shape;
+
+    if(canPlace(shape,x,y)){
+
+        for(let yy=0;yy<shape.length;yy++){
+
+            for(let xx=0;xx<shape[yy].length;xx++){
+
+                if(shape[yy][xx]){
+
+                    grid[y+yy][x+xx] = 1;
+                }
+            }
+        }
+
+        selectedBlock.element.remove();
+
+        selectedBlock = null;
+
+        score += 10;
+
+        clearLines();
+
+        updateScore();
+
+        drawBoard();
+
+        beep(700,80);
+
+        if(
+            document.querySelectorAll(".block")
+            .length === 0
+        ){
+            createBlocks();
+        }
+
+        checkGameOver();
+
+    }else{
+
+        beep(200,120);
+    }
+}
+
+/* ================= CLEAR ================= */
+
+function clearLines(){
+
+    let lines = 0;
+
+    for(let y=0;y<SIZE;y++){
+
+        if(grid[y].every(v=>v===1)){
+
+            lines++;
+
+            for(let x=0;x<SIZE;x++){
+
+                grid[y][x]=0;
+            }
+        }
+    }
+
+    for(let x=0;x<SIZE;x++){
+
+        let full = true;
+
+        for(let y=0;y<SIZE;y++){
+
+            if(!grid[y][x]){
+
+                full = false;
+            }
+        }
+
+        if(full){
+
+            lines++;
+
+            for(let y=0;y<SIZE;y++){
+
+                grid[y][x]=0;
+            }
+        }
+    }
+
+    if(lines){
+
+        score += lines * 100;
+
+        beep(1000,150);
+    }
+}
+
+/* ================= SCORE ================= */
+
+function updateScore(){
+
+    scoreEl.innerText = score;
+
+    if(score > highScore){
+
+        highScore = score;
+
+        localStorage.setItem(
+            "block_high",
+            highScore
+        );
+
+        highEl.innerText = highScore;
+    }
+}
+
+/* ================= GAME OVER ================= */
+
+function checkGameOver(){
+
+    const allBlocks =
+    [...document.querySelectorAll(".block")]
+    .map(b=>b.shape);
+
+    let possible = false;
+
+    for(let shape of allBlocks){
+
+        for(let y=0;y<SIZE;y++){
+
+            for(let x=0;x<SIZE;x++){
+
+                if(canPlace(shape,x,y)){
+
+                    possible = true;
+                }
+            }
+        }
+    }
+
+    if(!possible){
+
+        document.getElementById(
+            "gameOver"
+        ).style.display = "flex";
+    }
+}
+
+/* ================= RESTART ================= */
+
+function restartGame(){
+
+    score = 0;
+
+    updateScore();
+
+    selectedBlock = null;
+
+    document.getElementById(
+        "gameOver"
+    ).style.display = "none";
+
+    createBoard();
+
+    createBlocks();
+
+    drawBoard();
+}
+
+/* ================= START ================= */
+
+createBoard();
+
+createBlocks();
+
+drawBoard();
+
+</script>
+</body>
+</html>

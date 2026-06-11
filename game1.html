@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>NEON RUNNER X</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    overflow:hidden;
+    background:black;
+    touch-action:none;
+}
+
+canvas{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:1;
+}
+
+/* SCORE UI */
+
+#ui{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:50;
+}
+
+#scoreBox{
+
+    background:rgba(0,0,0,0.45);
+
+    border:1px solid rgba(0,255,255,0.3);
+
+    backdrop-filter:blur(10px);
+
+    padding:12px 20px;
+
+    border-radius:18px;
+
+    min-width:120px;
+
+    box-shadow:
+    0 0 20px rgba(0,255,255,0.15);
+}
+
+#scoreTitle{
+
+    font-size:12px;
+
+    letter-spacing:3px;
+
+    opacity:0.7;
+
+    margin-bottom:2px;
+
+    color:white;
+}
+
+#score{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    color:cyan;
+
+    text-shadow:
+    0 0 12px cyan,
+    0 0 25px cyan;
+}
+
+/* HOME BUTTON */
+
+#homeBtn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    z-index:50;
+
+    padding:12px 18px;
+
+    border:none;
+    border-radius:14px;
+
+    background:rgba(255,255,255,0.1);
+
+    color:white;
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    cursor:pointer;
+}
+
+/* MENU */
+
+#menu{
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+
+    z-index:100;
+
+    background:rgba(0,0,0,0.7);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    text-align:center;
+
+    padding:20px;
+}
+
+#menu h1{
+
+    font-size:52px;
+
+    margin-bottom:15px;
+
+    background:linear-gradient(90deg,cyan,hotpink);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+#menu p{
+    opacity:0.8;
+    margin-bottom:25px;
+    line-height:1.5;
+}
+
+#playBtn{
+
+    padding:16px 35px;
+
+    border:none;
+
+    border-radius:18px;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    background:linear-gradient(90deg,cyan,hotpink);
+
+    color:white;
+
+    cursor:pointer;
+}
+
+/* GAME OVER */
+
+#gameOverScreen{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:150;
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+    radial-gradient(circle at center,
+    rgba(0,255,255,0.12),
+    rgba(0,0,0,0.92));
+
+    backdrop-filter:blur(10px);
+}
+
+#gameOverCard{
+
+    width:320px;
+
+    max-width:90%;
+
+    background:
+    rgba(10,10,20,0.8);
+
+    border:
+    1px solid rgba(0,255,255,0.25);
+
+    border-radius:28px;
+
+    padding:35px 25px;
+
+    text-align:center;
+
+    box-shadow:
+    0 0 40px rgba(0,255,255,0.18);
+}
+
+#gameOverCard h1{
+
+    font-size:42px;
+
+    margin-bottom:15px;
+
+    background:
+    linear-gradient(90deg,cyan,hotpink);
+
+    -webkit-background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+}
+
+#finalScore{
+
+    font-size:22px;
+
+    color:white;
+
+    margin-bottom:28px;
+
+    opacity:0.9;
+}
+
+#againBtn,
+#backHomeBtn{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:16px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin-top:12px;
+}
+
+#againBtn{
+
+    background:
+    linear-gradient(90deg,cyan,hotpink);
+
+    color:white;
+}
+
+#backHomeBtn{
+
+    background:
+    rgba(255,255,255,0.08);
+
+    color:white;
+
+    border:
+    1px solid rgba(255,255,255,0.15);
+}
+
+/* MOBILE CONTROL */
+
+#mobileControls{
+
+    position:fixed;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    display:none;
+
+    gap:25px;
+
+    z-index:55;
+}
+
+.controlBtn{
+
+    width:85px;
+    height:85px;
+
+    border-radius:50%;
+
+    border:none;
+
+    background:rgba(255,255,255,0.12);
+
+    color:white;
+
+    font-size:34px;
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    user-select:none;
+    -webkit-user-select:none;
+
+    touch-action:manipulation;
+}
+
+.controlBtn:active{
+    transform:scale(0.92);
+    background:rgba(0,255,255,0.25);
+}
+
+@media(max-width:600px){
+
+    #menu h1{
+        font-size:42px;
+    }
+
+    .controlBtn{
+
+        width:78px;
+        height:78px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- SCORE -->
+
+<div id="ui">
+
+    <div id="scoreBox">
+
+        <div id="scoreTitle">
+            SCORE
+        </div>
+
+        <div id="score">
+            0
+        </div>
+
+    </div>
+
+</div>
+
+<!-- HOME -->
+
+<button id="homeBtn"
+onclick="window.location.href='home.html'">
+⬅ HOME
+</button>
+
+<!-- MOBILE CONTROL -->
+
+<div id="mobileControls">
+
+    <button class="controlBtn"
+    id="leftBtn">
+        ◀
+    </button>
+
+    <button class="controlBtn"
+    id="rightBtn">
+        ▶
+    </button>
+
+</div>
+
+<!-- MENU -->
+
+<div id="menu">
+
+    <h1>NEON RUNNER X</h1>
+
+    <p>
+        PC = A/D atau Arrow<br>
+        HP = Tombol bawah<br><br>
+        Semakin lama semakin cepat 🔥
+    </p>
+
+    <button id="playBtn">
+        PLAY GAME
+    </button>
+
+</div>
+
+<!-- GAME OVER -->
+
+<div id="gameOverScreen">
+
+    <div id="gameOverCard">
+
+        <h1>
+            GAME OVER
+        </h1>
+
+        <p id="finalScore">
+            SCORE: 0
+        </p>
+
+        <button id="againBtn">
+            PLAY AGAIN
+        </button>
+
+        <button id="backHomeBtn">
+            BACK HOME
+        </button>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
+
+const scene = new THREE.Scene();
+
+scene.fog =
+new THREE.Fog(0x000000,10,80);
+
+const isMobile =
+window.innerWidth < 768;
+
+const camera =
+new THREE.PerspectiveCamera(
+
+    isMobile ? 85 : 70,
+
+    window.innerWidth /
+    window.innerHeight,
+
+    0.1,
+
+    1000
+);
+
+if(isMobile){
+
+    camera.position.set(0,5.5,12);
+
+}else{
+
+    camera.position.set(0,4,8);
+
+}
+
+const renderer =
+new THREE.WebGLRenderer({
+    antialias:true
+});
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio,2)
+);
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+const ambient =
+new THREE.AmbientLight(0xffffff,0.6);
+
+scene.add(ambient);
+
+const cyanLight =
+new THREE.PointLight(0x00ffff,2,100);
+
+cyanLight.position.set(0,8,5);
+
+scene.add(cyanLight);
+
+const pinkLight =
+new THREE.PointLight(0xff00ff,2,100);
+
+pinkLight.position.set(0,5,-15);
+
+scene.add(pinkLight);
+
+const roadGeo =
+new THREE.PlaneGeometry(18,250);
+
+const roadMat =
+new THREE.MeshStandardMaterial({
+    color:0x101010,
+    metalness:1,
+    roughness:0.2
+});
+
+const road =
+new THREE.Mesh(roadGeo,roadMat);
+
+road.rotation.x = -Math.PI/2;
+
+road.position.z = -80;
+
+scene.add(road);
+
+const grid =
+new THREE.GridHelper(
+    18,
+    30,
+    0x00ffff,
+    0xff00ff
+);
+
+scene.add(grid);
+
+const player =
+new THREE.Group();
+
+const bodyGeo =
+new THREE.BoxGeometry(1.5,0.8,3);
+
+const bodyMat =
+new THREE.MeshStandardMaterial({
+
+    color:0x111111,
+
+    emissive:0x00ffff,
+
+    emissiveIntensity:2
+});
+
+const body =
+new THREE.Mesh(bodyGeo,bodyMat);
+
+player.add(body);
+
+const glassGeo =
+new THREE.BoxGeometry(0.8,0.3,1);
+
+const glassMat =
+new THREE.MeshStandardMaterial({
+
+    color:0x00ffff,
+
+    emissive:0x00ffff,
+
+    emissiveIntensity:4
+});
+
+const glass =
+new THREE.Mesh(glassGeo,glassMat);
+
+glass.position.y = 0.35;
+
+player.add(glass);
+
+player.position.y = 0.6;
+
+scene.add(player);
+
+const obstacles = [];
+
+function createObstacle(){
+
+    const size =
+    1.5 + Math.random()*1.5;
+
+    const geo =
+    new THREE.BoxGeometry(
+        size,
+        size,
+        size
+    );
+
+    const color =
+    Math.random() > 0.5
+    ? 0xff00ff
+    : 0x00ffff;
+
+    const mat =
+    new THREE.MeshStandardMaterial({
+
+        color:color,
+
+        emissive:color,
+
+        emissiveIntensity:1.5
+    });
+
+    const obs =
+    new THREE.Mesh(geo,mat);
+
+    obs.position.x =
+    (Math.random()-0.5)*12;
+
+    obs.position.y = 1;
+
+    obs.position.z = -120;
+
+    scene.add(obs);
+
+    obstacles.push(obs);
+}
+
+let playing = false;
+
+let score = 0;
+
+let speed = 0.45;
+
+setInterval(()=>{
+
+    if(playing){
+
+        createObstacle();
+
+    }
+
+},700);
+
+const keys = {};
+
+window.addEventListener('keydown',(e)=>{
+
+    keys[e.key.toLowerCase()] = true;
+
+});
+
+window.addEventListener('keyup',(e)=>{
+
+    keys[e.key.toLowerCase()] = false;
+
+});
+
+let moveLeft = false;
+let moveRight = false;
+
+const leftBtn =
+document.getElementById('leftBtn');
+
+const rightBtn =
+document.getElementById('rightBtn');
+
+function setupTouch(button,direction){
+
+    button.addEventListener(
+        'touchstart',
+        (e)=>{
+
+        e.preventDefault();
+
+        if(direction === 'left'){
+            moveLeft = true;
+        }
+
+        if(direction === 'right'){
+            moveRight = true;
+        }
+
+    }, { passive:false });
+
+    button.addEventListener(
+        'touchend',
+        ()=>{
+
+        moveLeft = false;
+        moveRight = false;
+
+    });
+
+}
+
+setupTouch(leftBtn,'left');
+setupTouch(rightBtn,'right');
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+    if(playing){
+
+        speed += 0.00012;
+
+        if(
+            keys['a'] ||
+            keys['arrowleft'] ||
+            moveLeft
+        ){
+
+            player.position.x -= 0.18;
+
+            player.rotation.z = 0.15;
+
+        }
+
+        else if(
+            keys['d'] ||
+            keys['arrowright'] ||
+            moveRight
+        ){
+
+            player.position.x += 0.18;
+
+            player.rotation.z = -0.15;
+
+        }
+
+        else{
+
+            player.rotation.z *= 0.88;
+
+        }
+
+        player.position.x =
+        Math.max(
+            -5.5,
+            Math.min(5.5,player.position.x)
+        );
+
+        road.position.z += speed;
+
+        if(road.position.z > 40){
+
+            road.position.z = -80;
+
+        }
+
+        obstacles.forEach((obs,index)=>{
+
+            obs.position.z += speed + 0.5;
+
+            obs.rotation.x += 0.02;
+            obs.rotation.y += 0.02;
+
+            if(obs.position.z > 10){
+
+                scene.remove(obs);
+
+                obstacles.splice(index,1);
+
+                score++;
+
+                document.getElementById('score')
+                .innerText = score;
+            }
+
+            const dx =
+            player.position.x -
+            obs.position.x;
+
+            const dz =
+            player.position.z -
+            obs.position.z;
+
+            if(
+                Math.abs(dx) < 1.5 &&
+                Math.abs(dz) < 2
+            ){
+
+                gameOver();
+
+            }
+
+        });
+
+        camera.position.x +=
+        (
+            player.position.x -
+            camera.position.x
+        ) * 0.08;
+
+    }
+
+    renderer.render(scene,camera);
+}
+
+animate();
+
+function startGame(){
+
+    document.getElementById(
+        'gameOverScreen'
+    ).style.display = 'none';
+
+    obstacles.forEach(o=>scene.remove(o));
+
+    obstacles.length = 0;
+
+    score = 0;
+
+    speed = 0.45;
+
+    player.position.x = 0;
+
+    document.getElementById('score')
+    .innerText = score;
+
+    playing = true;
+
+    document.getElementById('menu')
+    .style.display = 'none';
+
+    document.getElementById(
+        'mobileControls'
+    ).style.display = 'flex';
+}
+
+function gameOver(){
+
+    playing = false;
+
+    document.getElementById(
+        'mobileControls'
+    ).style.display = 'none';
+
+    document.getElementById(
+        'finalScore'
+    ).innerText =
+    'SCORE: ' + score;
+
+    document.getElementById(
+        'gameOverScreen'
+    ).style.display = 'flex';
+}
+
+document
+.getElementById('playBtn')
+.addEventListener('click',()=>{
+
+    startGame();
+
+});
+
+document
+.getElementById('againBtn')
+.addEventListener('click',()=>{
+
+    startGame();
+
+});
+
+document
+.getElementById('backHomeBtn')
+.addEventListener('click',()=>{
+
+    window.location.href =
+    'home.html';
+
+});
+
+window.addEventListener('resize',()=>{
+
+    const mobile =
+    window.innerWidth < 768;
+
+    camera.fov = mobile ? 85 : 70;
+
+    if(mobile){
+
+        camera.position.set(0,5.5,12);
+
+    }else{
+
+        camera.position.set(0,4,8);
+
+    }
+
+    camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+});
+
+</script>
+
+</body>
+</html>

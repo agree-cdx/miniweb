@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontak Saya</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#07142b;
+    color:white;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:500px;
+    background:#15233f;
+    padding:35px;
+    border-radius:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    text-align:center;
+}
+
+h1{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+.desc{
+    color:#9fb7e8;
+    margin-bottom:30px;
+}
+
+.contact{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.btn{
+    text-decoration:none;
+    color:white;
+    padding:18px;
+    border-radius:16px;
+    font-size:20px;
+    font-weight:bold;
+    transition:.25s;
+    display:block;
+}
+
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+
+.ig{
+    background:linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045);
+}
+
+.wa{
+    background:linear-gradient(45deg,#00c853,#00e676);
+}
+
+.tt{
+    background:linear-gradient(45deg,#111,#00f2ea,#ff0050);
+}
+
+.back-btn{
+    position:fixed;
+    left:20px;
+    bottom:20px;
+    background:#2d8cff;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<button class="back-btn" onclick="history.back()">← Kembali</button>
+
+<div class="container">
+    <h1>📱 Kontak Saya</h1>
+    <div class="desc">Hubungi / follow saya di sini</div>
+
+    <div class="contact">
+        <a href="https://instagram.com/ahmdgrii_" target="_blank" class="btn ig">
+            📸 Instagram
+        </a>
+
+        <a href="https://wa.me/628xxxxxxxxxx" target="_blank" class="btn wa">
+            💬 WhatsApp
+        </a>
+
+        <a href="https://tiktok.com/@ahmdgrii" target="_blank" class="btn tt">
+            🎵 TikTok
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

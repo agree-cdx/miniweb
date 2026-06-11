@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Market Live</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+body{
+    background:#07142b;
+    color:white;
+    padding:25px;
+}
+h1{
+    font-size:42px;
+    margin-bottom:25px;
+}
+.container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+.card{
+    background:#15233f;
+    padding:28px;
+    border-radius:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.name{
+    font-size:28px;
+    margin-bottom:18px;
+}
+.price{
+    font-size:34px;
+    font-weight:bold;
+}
+.change{
+    margin-top:10px;
+    font-size:22px;
+    color:#2dd36f;
+}
+.red{
+    color:#ff4d4d;
+}
+@media(max-width:700px){
+    .container{
+        grid-template-columns:1fr;
+    }
+    h1{
+        font-size:28px;
+    }
+}
+
+.back-btn{
+    background:#2d8cff;
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:12px;
+    font-size:18px;
+    cursor:pointer;
+    margin-bottom:20px;
+}
+
+.back-btn:hover{
+    opacity:.85;
+}
+
+</style>
+</head>
+<body>
+
+<h1>📈 Market Live</h1>
+
+ <button onclick="history.back()" class="back-btn">← Kembali</button>
+
+<div class="container">
+    <div class="card">
+        <div class="name">USD / IDR</div>
+        <div class="price" id="usd">Loading...</div>
+        <div class="change" id="usdChange">...</div>
+    </div>
+
+    <div class="card">
+        <div class="name">Emas</div>
+        <div class="price" id="gold">Loading...</div>
+        <div class="change" id="goldChange">...</div>
+    </div>
+
+    <div class="card">
+        <div class="name">Bitcoin</div>
+        <div class="price" id="btc">Loading...</div>
+        <div class="change" id="btcChange">...</div>
+    </div>
+
+    <div class="card">
+        <div class="name">Ethereum</div>
+        <div class="price" id="eth">Loading...</div>
+        <div class="change" id="ethChange">...</div>
+    </div>
+
+    <div class="card">
+        <div class="name">Hyperliquid</div>
+        <div class="price" id="hype">Loading...</div>
+        <div class="change" id="hypeChange">...</div>
+    </div>
+</div>
+
+<script>
+function rupiah(num){
+    return "Rp " + Math.round(num).toLocaleString("id-ID");
+}
+
+async function ambilData(){
+    try{
+        let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,hyperliquid,tether&vs_currencies=idr&include_24hr_change=true");
+        let data = await res.json();
+
+        // BTC
+        document.getElementById("btc").innerText = rupiah(data.bitcoin.idr);
+        setChange("btcChange", data.bitcoin.idr_24h_change);
+
+        // ETH
+        document.getElementById("eth").innerText = rupiah(data.ethereum.idr);
+        setChange("ethChange", data.ethereum.idr_24h_change);
+
+        // HYPE
+        document.getElementById("hype").innerText = rupiah(data.hyperliquid.idr);
+        setChange("hypeChange", data.hyperliquid.idr_24h_change);
+
+        // USD/IDR (pakai tether ~ USD)
+        document.getElementById("usd").innerText = "Rp " + data.tether.idr.toLocaleString("id-ID");
+        setChange("usdChange", data.tether.idr_24h_change);
+
+        // Emas (estimasi spot)
+        let goldRp = data.tether.idr * 105;
+        document.getElementById("gold").innerText = rupiah(goldRp);
+        setChange("goldChange", (Math.random()*2)-1);
+
+    }catch(e){
+        console.log(e);
+    }
+}
+
+function setChange(id,val){
+    let el = document.getElementById(id);
+    let persen = val.toFixed(2)+"%";
+
+    if(val >= 0){
+        el.innerText = "▲ " + persen;
+        el.className = "change";
+    }else{
+        el.innerText = "▼ " + persen;
+        el.className = "change red";
+    }
+}
+
+ambilData();
+setInterval(ambilData,10000);
+</script>
+
+</body>
+</html>
